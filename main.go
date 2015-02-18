@@ -17,13 +17,13 @@ func assert(err error) {
 func main() {
 	client := slack.New(os.Getenv("SLACK_TOKEN"))
 	func() {
-		result, err := client.ApiTest("hello", "world")
+		result, err := client.ApiTest(slack.ApiTestReq{Foo: "hello", Err: "world"})
 		assert(err)
 		fmt.Printf("%+v\n", result)
 	}()
 
 	func() {
-		result, err := client.ApiTest("hello", "")
+		result, err := client.ApiTest(slack.ApiTestReq{Foo: "hello"})
 		assert(err)
 		fmt.Printf("%+v\n", result)
 	}()

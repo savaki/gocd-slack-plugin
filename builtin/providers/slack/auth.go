@@ -12,7 +12,9 @@ func newApiFunc(token string) ApiFunc {
 	return func(method string, params map[string]string, v interface{}) error {
 		values := url.Values{}
 		for key, value := range params {
-			values.Set(key, value)
+			if value != "" {
+				values.Set(key, value)
+			}
 		}
 		values.Set("token", token)
 

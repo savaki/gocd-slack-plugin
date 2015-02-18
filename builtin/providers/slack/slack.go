@@ -10,22 +10,24 @@ func New(token string) *Client {
 	}
 }
 
-type ApiTestResponse struct {
+type ApiTestReq struct {
+	Foo string
+	Err string
+}
+
+type ApiTestResp struct {
 	Ok    bool              `json:"ok"`
 	Error string            `json:"error,omitempty"`
 	Args  map[string]string `json:"args,omitempty"`
 }
 
-func (c *Client) ApiTest(foo, errString string) (*ApiTestResponse, error) {
-	params := map[string]string{}
-	if errString != "" {
-		params["error"] = errString
-	}
-	if foo != "" {
-		params["foo"] = foo
+func (c *Client) ApiTest(input ApiTestReq) (*ApiTestResp, error) {
+	params := map[string]string{
+		"error": input.Err,
+		"foo":   input.Foo,
 	}
 
-	v := &ApiTestResponse{}
+	v := &ApiTestResp{}
 	err := c.slack("api.test", params, v)
 	return v, err
 }
