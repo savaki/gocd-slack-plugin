@@ -4,11 +4,6 @@ import (
 	"github.com/savaki/gocd-slack-plugin/form"
 )
 
-type Attachment struct {
-	Pretext string `json:"pretext"`
-	Text    string `json:"text"`
-}
-
 type PostMessageReq struct {
 	Channel     string       `form:"channel"`
 	Text        string       `form:"text"`

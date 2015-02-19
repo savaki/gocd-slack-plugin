@@ -49,15 +49,3 @@ func (c *Client) AuthTest() (*AuthTestResponse, error) {
 	err := c.slack("auth.test", url.Values{}, resp)
 	return resp, err
 }
-
-type RtmStartResp struct {
-	Ok    bool   `json:"ok"`
-	Error string `json:"error,omitempty"`
-	Url   string `json:"url"`
-}
-
-func (c *Client) RtmStart() (*RtmStartResp, error) {
-	resp := &RtmStartResp{}
-	err := c.slack("rtm.start", url.Values{}, resp)
-	return resp, err
-}

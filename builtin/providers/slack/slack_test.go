@@ -15,7 +15,7 @@ func TestApi(t *testing.T) {
 		client = New("blah")
 		client.slack = mock.Handle
 
-		Convey("When I call #api.test", func() {
+		Convey("When I call #ApiTest", func() {
 			mock.Response = `
 {
     "ok": false,
@@ -42,7 +42,7 @@ func TestApi(t *testing.T) {
 			})
 		})
 
-		Convey("When I call #auth.test", func() {
+		Convey("When I call #AuthTest", func() {
 			mock.Response = `
 {
     "ok": true,
@@ -68,7 +68,7 @@ func TestApi(t *testing.T) {
 			})
 		})
 
-		Convey("When I call #chat.postMessage", func() {
+		Convey("When I call #RtmStart", func() {
 			mock.Response = `
 {
     "ok": true,

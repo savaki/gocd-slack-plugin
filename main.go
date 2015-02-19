@@ -1,15 +1,11 @@
 package main
 
 import (
-	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"log"
-	"net/http"
-	"net/url"
 	"os"
 
-	"github.com/gorilla/websocket"
 	"github.com/savaki/gocd-slack-plugin/builtin/providers/slack"
 )
 
@@ -17,6 +13,19 @@ func assert(err error) {
 	if err != nil {
 		log.Fatalln(err)
 	}
+}
+
+type EventHandler struct {
+}
+
+func (e *EventHandler) OnMessage(v slack.MessageEvent) error {
+	data, err := json.MarshalIndent(v, "", "  ")
+	if err != nil {
+		return err
+	}
+
+	fmt.Println(string(data))
+	return nil
 }
 
 func main() {
@@ -40,31 +49,34 @@ func main() {
 	}()
 
 	func() {
-		result, err := client.RtmStart()
-		assert(err)
-		fmt.Printf("%+v\n", result)
-
-		u, err := url.Parse(result.Url)
+		handler := &EventHandler{}
+		err := client.Listen(handler)
 		assert(err)
 
-		target := fmt.Sprintf("%s:443", u.Host)
-		fmt.Printf("dialing %s\n", target)
-		rawConn, err := tls.Dial("tcp", target, nil)
-		assert(err)
+		// data, err := json.MarshalIndent(result, "", "  ")
+		// assert(err)
+		// fmt.Println(string(data))
 
-		wsHeaders := http.Header{
-			"Origin":                   {result.Url},
-			"Sec-WebSocket-Extensions": {"permessage-deflate; client_max_window_bits, x-webkit-deflate-frame"},
-		}
+		// u, err := url.Parse(result.Url)
+		// assert(err)
 
-		wsConn, resp, err := websocket.NewClient(rawConn, u, wsHeaders, 1024, 1024)
-		fmt.Printf("statusCode = %d\n", resp.StatusCode)
-		v := &json.RawMessage{}
+		// target := fmt.Sprintf("%s:443", u.Host)
+		// fmt.Printf("dialing %s\n", target)
+		// rawConn, err := tls.Dial("tcp", target, nil)
+		// assert(err)
 
-		for {
-			wsConn.ReadMessage()
-			wsConn.ReadJSON(v)
-			fmt.Println(string([]byte(*v)))
-		}
+		// wsHeaders := http.Header{
+		// 	"Origin":                   {result.Url},
+		// 	"Sec-WebSocket-Extensions": {"permessage-deflate; client_max_window_bits, x-webkit-deflate-frame"},
+		// }
+
+		// wsConn, resp, err := websocket.NewClient(rawConn, u, wsHeaders, 1024, 1024)
+		// fmt.Printf("statusCode = %d\n", resp.StatusCode)
+		// v := &json.RawMessage{}
+
+		// for {
+		// 	wsConn.ReadJSON(v)
+		// 	fmt.Println(string([]byte(*v)))
+		// }
 	}()
 }
