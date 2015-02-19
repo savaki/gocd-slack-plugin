@@ -16,6 +16,7 @@ func assert(err error) {
 }
 
 type EventHandler struct {
+	api *slack.Client
 }
 
 func (e *EventHandler) OnMessage(v slack.MessageEvent) error {
@@ -24,12 +25,24 @@ func (e *EventHandler) OnMessage(v slack.MessageEvent) error {
 		return err
 	}
 
+	if v.User != "" {
+		go func() {
+			e.api.PostMessage(slack.PostMessageReq{
+				Channel:  v.Channel,
+				Text:     fmt.Sprintf("I heard => %s", v.Text),
+				Username: "wakka",
+			})
+		}()
+	}
+
 	fmt.Println(string(data))
 	return nil
 }
 
 func main() {
-	client := slack.New(os.Getenv("SLACK_TOKEN"))
+	client, err := slack.New(os.Getenv("SLACK_TOKEN"))
+	assert(err)
+
 	func() {
 		result, err := client.ApiTest(slack.ApiTestReq{Foo: "hello", Err: "world"})
 		assert(err)
@@ -49,34 +62,8 @@ func main() {
 	}()
 
 	func() {
-		handler := &EventHandler{}
+		handler := &EventHandler{api: client}
 		err := client.Listen(handler)
 		assert(err)
-
-		// data, err := json.MarshalIndent(result, "", "  ")
-		// assert(err)
-		// fmt.Println(string(data))
-
-		// u, err := url.Parse(result.Url)
-		// assert(err)
-
-		// target := fmt.Sprintf("%s:443", u.Host)
-		// fmt.Printf("dialing %s\n", target)
-		// rawConn, err := tls.Dial("tcp", target, nil)
-		// assert(err)
-
-		// wsHeaders := http.Header{
-		// 	"Origin":                   {result.Url},
-		// 	"Sec-WebSocket-Extensions": {"permessage-deflate; client_max_window_bits, x-webkit-deflate-frame"},
-		// }
-
-		// wsConn, resp, err := websocket.NewClient(rawConn, u, wsHeaders, 1024, 1024)
-		// fmt.Printf("statusCode = %d\n", resp.StatusCode)
-		// v := &json.RawMessage{}
-
-		// for {
-		// 	wsConn.ReadJSON(v)
-		// 	fmt.Println(string([]byte(*v)))
-		// }
 	}()
 }

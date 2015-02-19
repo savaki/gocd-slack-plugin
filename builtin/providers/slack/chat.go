@@ -27,7 +27,7 @@ type PostMessageResp struct {
 func (c *Client) PostMessage(req PostMessageReq) (*PostMessageResp, error) {
 	values := form.AsValues(req)
 	resp := &PostMessageResp{}
-	err := c.slack("chat.postMessage", values, resp)
+	err := c.api("chat.postMessage", values, resp)
 	return resp, err
 }
 
@@ -48,6 +48,6 @@ type UpdateMessageResp struct {
 func (c *Client) UpdateMessage(req UpdateMessageReq) (*UpdateMessageResp, error) {
 	values := form.AsValues(req)
 	resp := &UpdateMessageResp{}
-	err := c.slack("chat.updateMessage", values, resp)
+	err := c.api("chat.updateMessage", values, resp)
 	return resp, err
 }

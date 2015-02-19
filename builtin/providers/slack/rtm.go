@@ -27,7 +27,7 @@ type RtmStartResp struct {
 
 func (c *Client) RtmStart() (*RtmStartResp, error) {
 	resp := &RtmStartResp{}
-	err := c.slack("rtm.start", url.Values{}, resp)
+	err := c.api("rtm.start", url.Values{}, resp)
 	return resp, err
 }
 
@@ -93,7 +93,7 @@ func processMessage(wsConn *websocket.Conn, handler interface{}) error {
 	case "message":
 		if r, ok := handler.(MessageReceiver); ok {
 			v := MessageEvent{}
-			err = unmarshalAndInvoke(data, v, func() error { return r.OnMessage(v) })
+			err = unmarshalAndInvoke(data, &v, func() error { return r.OnMessage(v) })
 		}
 	}
 
@@ -101,7 +101,7 @@ func processMessage(wsConn *websocket.Conn, handler interface{}) error {
 }
 
 func unmarshalAndInvoke(data []byte, v interface{}, callback func() error) error {
-	err := json.Unmarshal(data, &v)
+	err := json.Unmarshal(data, v)
 	if err != nil {
 		return err
 	}

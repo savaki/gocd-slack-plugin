@@ -18,13 +18,6 @@ func newApiFunc(token string) ApiFunc {
 		}
 		defer resp.Body.Close()
 
-		// data, err := ioutil.ReadCopy(resp.Body)
-		// if err != nil {
-		// 	return err
-		// }
-		// fmt.Println(string(data))
-		// return json.Unmarshal(data, v)
-
 		return json.NewDecoder(resp.Body).Decode(v)
 	}
 }

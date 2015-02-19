@@ -1,19 +1,46 @@
 package slack
 
 import (
+	"errors"
 	"net/url"
 
 	"github.com/savaki/gocd-slack-plugin/form"
 )
 
-type Client struct {
-	slack ApiFunc
+type Self struct {
+	Team   string
+	User   string
+	TeamId string
+	UserId string
 }
 
-func New(token string) *Client {
-	return &Client{
-		slack: newApiFunc(token),
+type Client struct {
+	Self Self
+	api  ApiFunc
+}
+
+func New(token string) (*Client, error) {
+	api := newApiFunc(token)
+
+	authInfo, err := authTest(api)
+	if err != nil {
+		return nil, err
 	}
+	if !authInfo.Ok {
+		return nil, errors.New(authInfo.Error)
+	}
+
+	client := &Client{
+		Self: Self{
+			Team:   authInfo.Team,
+			TeamId: authInfo.TeamId,
+			User:   authInfo.User,
+			UserId: authInfo.UserId,
+		},
+		api: api,
+	}
+
+	return client, nil
 }
 
 type ApiTestReq struct {
@@ -30,7 +57,7 @@ type ApiTestResp struct {
 func (c *Client) ApiTest(input ApiTestReq) (*ApiTestResp, error) {
 	values := form.AsValues(input)
 	resp := &ApiTestResp{}
-	err := c.slack("api.test", values, resp)
+	err := c.api("api.test", values, resp)
 	return resp, err
 }
 
@@ -45,7 +72,11 @@ type AuthTestResponse struct {
 }
 
 func (c *Client) AuthTest() (*AuthTestResponse, error) {
+	return authTest(c.api)
+}
+
+func authTest(api ApiFunc) (*AuthTestResponse, error) {
 	resp := &AuthTestResponse{}
-	err := c.slack("auth.test", url.Values{}, resp)
+	err := api("auth.test", url.Values{}, resp)
 	return resp, err
 }
