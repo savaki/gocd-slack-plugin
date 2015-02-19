@@ -1,46 +1,23 @@
 package slack
 
 import (
-	"errors"
 	"net/url"
 
 	"github.com/savaki/gocd-slack-plugin/form"
 )
 
-type Self struct {
-	Team   string
-	User   string
-	TeamId string
-	UserId string
-}
-
 type Client struct {
-	Self Self
-	api  ApiFunc
+	api ApiFunc
 }
 
-func New(token string) (*Client, error) {
+func New(token string) *Client {
 	api := newApiFunc(token)
 
-	authInfo, err := authTest(api)
-	if err != nil {
-		return nil, err
-	}
-	if !authInfo.Ok {
-		return nil, errors.New(authInfo.Error)
-	}
-
 	client := &Client{
-		Self: Self{
-			Team:   authInfo.Team,
-			TeamId: authInfo.TeamId,
-			User:   authInfo.User,
-			UserId: authInfo.UserId,
-		},
 		api: api,
 	}
 
-	return client, nil
+	return client
 }
 
 type ApiTestReq struct {

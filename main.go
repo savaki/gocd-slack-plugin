@@ -40,8 +40,7 @@ func (e *EventHandler) OnMessage(v slack.MessageEvent) error {
 }
 
 func main() {
-	client, err := slack.New(os.Getenv("SLACK_TOKEN"))
-	assert(err)
+	client := slack.New(os.Getenv("SLACK_TOKEN"))
 
 	func() {
 		result, err := client.ApiTest(slack.ApiTestReq{Foo: "hello", Err: "world"})
