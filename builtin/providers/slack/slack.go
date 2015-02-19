@@ -57,5 +57,7 @@ type RtmStartResp struct {
 }
 
 func (c *Client) RtmStart() (*RtmStartResp, error) {
-	return nil, nil
+	resp := &RtmStartResp{}
+	err := c.slack("rtm.start", url.Values{}, resp)
+	return resp, err
 }
