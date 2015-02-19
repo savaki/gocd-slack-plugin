@@ -14,7 +14,7 @@ type PostMessageReq struct {
 	Text        string       `form:"text"`
 	Username    string       `form:"username"`
 	Parse       string       `form:"parse"`
-	LinkNames   int          `form:"link_names"`
+	LinkNames   int          `form:"link_names,omitempty"`
 	Attachments []Attachment `form:"attachments"`
 	UnfurlLinks *bool        `form:"unfurl_links"`
 	UnfurlMedia *bool        `form:"unfurl_media"`
@@ -33,5 +33,26 @@ func (c *Client) PostMessage(req PostMessageReq) (*PostMessageResp, error) {
 	values := form.AsValues(req)
 	resp := &PostMessageResp{}
 	err := c.slack("chat.postMessage", values, resp)
+	return resp, err
+}
+
+type UpdateMessageReq struct {
+	Ts      string `form:"ts"`
+	Channel string `form:"channel"`
+	Text    string `form:"text"`
+}
+
+type UpdateMessageResp struct {
+	Ok      bool   `json:"ok"`
+	Error   string `json:"error,omitempty"`
+	Channel string `json:"channel"`
+	Ts      string `json:"ts"`
+	Text    string `json:"ts"`
+}
+
+func (c *Client) UpdateMessage(req UpdateMessageReq) (*UpdateMessageResp, error) {
+	values := form.AsValues(req)
+	resp := &UpdateMessageResp{}
+	err := c.slack("chat.updateMessage", values, resp)
 	return resp, err
 }

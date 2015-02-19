@@ -8,7 +8,7 @@ import (
 
 func TestMarshal(t *testing.T) {
 	Convey("Given a form", t, func() {
-		Convey("When I #AsValues string fields", func() {
+		Convey("#AsValues string fields", func() {
 			form := struct {
 				Name string `form:"name"`
 			}{
@@ -21,7 +21,7 @@ func TestMarshal(t *testing.T) {
 			})
 		})
 
-		Convey("When I #AsValues int fields", func() {
+		Convey("#AsValues int fields", func() {
 			form := struct {
 				Count int `form:"c"`
 			}{
@@ -34,7 +34,20 @@ func TestMarshal(t *testing.T) {
 			})
 		})
 
-		Convey("When I #AsValues bool fields", func() {
+		Convey("#AsValues honors omitempty on int fields", func() {
+			form := struct {
+				Count int `form:"c,omitempty"`
+			}{
+				Count: 0,
+			}
+			params := AsValues(&form)
+
+			Convey("Should return valid url.Values", func() {
+				So(params.Encode(), ShouldEqual, "")
+			})
+		})
+
+		Convey("#AsValues bool fields", func() {
 			form := struct {
 				Yep bool `form:"y"`
 			}{
