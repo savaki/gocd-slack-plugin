@@ -17,10 +17,12 @@ var (
 
 func AsValues(v interface{}) url.Values {
 	params := url.Values{}
-
 	r := reflect.TypeOf(v)
+	formStruct := reflect.ValueOf(v)
 
-	formStruct := reflect.ValueOf(v).Elem()
+	if r.Kind() == reflect.Ptr {
+		return AsValues(formStruct.Elem().Interface())
+	}
 
 	for i := 0; i < r.NumField(); i++ {
 		typeField := r.Field(i)

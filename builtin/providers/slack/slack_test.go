@@ -31,7 +31,8 @@ func TestApi(t *testing.T) {
 			})
 
 			Convey("And the params should be assigned correctly", func() {
-				So(mock.Params, ShouldResemble, map[string]string{"foo": "bar", "error": "boom!"})
+				So(mock.Params.Get("foo"), ShouldEqual, "bar")
+				So(mock.Params.Get("err"), ShouldEqual, "boom!")
 			})
 
 			Convey("And the response should be set ok", func() {
